@@ -1,3 +1,8 @@
+### react pure, redux and context api use
+write some samples for how to use pure react, redux and context api to manage props and state
+
+it's based on create-react-app, following is the details 
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
