@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App-repure';
+import App from './App-redux';
 import * as serviceWorker from './serviceWorker';
 
 //https://daveceddia.com/context-api-vs-redux/

@@ -3,55 +3,27 @@ import React from "react";
 import "./App.css";
 // 图片必须引入进来，不能直接在下面写
 import avatar from "./avatar.jpeg";
+import { createStore } from 'redux';
+import { connect, Provider } from 'react-redux';
 
-import {createStore} from 'redux';
-import {connect, provider} from 'react-redux';
+// state： 状态
+const SET_USER = "SET_USER";
+const initState = {};
 
-const UserAvatar = ({ user, size }) => (
-  <img className={`user avatar ${size || ""}`}
-    alt="user avatar"
-    src={user.avatar}></img>
-)
+// reducer: 合成新的state，让react去重新刷新渲染整个dom数
+function reducer(state = initState, action) {
+  switch (action.type) {
+    case SET_USER:
+      return { ...state, user: action.user };
+    default:
+      return state;
+  }
+}
 
-const UserStats = ({ user }) => (
-  <div className="user-stats">
-    <div>
-      <UserAvatar user={user}></UserAvatar>
-      {user.name}
-    </div>
-    <div className="stats">
-      <div>{user.followers} Followers</div>
-      <div>Follwing {user.following}</div>
-    </div>
-  </div>
-)
-
-const Content = () => (
-  <div className="content">main content here</div>
-)
-
-const Siderbar = ({ user }) => (
-  <div className="sidebar" >
-    <UserStats user={user}></UserStats>
-  </div>
-)
-
-const Nav = ({ user }) => (
-  <div className="nav">
-    <UserAvatar user={user} size="small"></UserAvatar>
-  </div>
-);
-
-// 箭头函数小括号直接返回
-const Body = ({ user }) => (
-  <div className="body">
-    <Siderbar user={user}></Siderbar>
-    <Content></Content>
-  </div>
-)
-
-class App extends React.Component {
-  state = {
+// actionCreator： 用于返回需要更改的状态类型
+function setUser() {
+  return {
+    type: SET_USER,
     user: {
       avatar: avatar,
       name: "jason",
@@ -59,26 +31,72 @@ class App extends React.Component {
       following: 4321
     }
   }
-
-  /**
-   * App
-   *  Nav
-   *    UserAvatar
-   *  Body
-   *    SideBar
-   *      UserStats
-   *        UserAvatar
-   *    Content
-   */
-  render() {
-    const { user } = this.state;
-    return (
-      <div className="app">
-        <Nav user={user}></Nav>
-        <Body user={user}></Body>
-      </div>
-    );
-  }
 }
+
+// createStore： 创建一个store, 总的控制所有
+const store = createStore(reducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  );
+
+// default to dispatch set user
+store.dispatch(setUser());
+
+const mapStateToProps = state => ({
+  user: state.user
+})
+
+// 这里connect把state中的user放到props上面，然后再解构到user的参数给组件使用
+const UserAvatar = connect(mapStateToProps)(({ user, size }) => (
+  <img className={`user avatar ${size || ""}`}
+    alt="user avatar"
+    src={user.avatar}></img>
+));
+
+
+const UserStats = connect(mapStateToProps)(({ user }) => (
+  <div className="user-stats">
+    <div>
+      <UserAvatar></UserAvatar>
+      {user.name}
+    </div>
+    <div className="stats">
+      <div>{user.followers} Followers</div>
+      <div>Follwing {user.following}</div>
+    </div>
+  </div>
+));
+
+const Nav = () => (
+  <div className="nav">
+    <UserAvatar size="small"></UserAvatar>
+  </div>
+)
+
+
+const Siderbar = () => (
+  <div className="sidebar" >
+    <UserStats ></UserStats>
+  </div>
+)
+
+const Content = () => (
+  <div className="content">main content here</div>
+)
+
+const Body = () => (
+  <div className="body">
+    <Siderbar></Siderbar>
+    <Content></Content>
+  </div>
+)
+
+const App = () => (
+  <Provider store={store}>
+    <div className="app">
+      <Nav></Nav>
+      <Body></Body>
+    </div>
+  </Provider>
+)
 
 export default App;
